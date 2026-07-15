@@ -223,3 +223,151 @@ Copilot and OpenCode, keep the canonical rules in `AGENTS.md` and link
 Either way, `AGENTS.md` stays the single source of truth, and GitHub Copilot,
 OpenCode, and Claude Code all end up following the same repository
 conventions.
+
+## Installing the CLI Tools
+
+Both GitHub Copilot CLI and OpenCode CLI run in the terminal, so you can try
+this repository's shared instructions with either tool.
+
+### GitHub Copilot CLI
+
+GitHub Copilot CLI requires an active GitHub Copilot subscription. Install it
+with one of the following, then run `copilot` and authenticate with `/login`
+on first launch.
+
+```bash
+# npm (all platforms, requires Node.js 22 or later)
+npm install -g @github/copilot
+
+# Homebrew (macOS and Linux)
+brew install --cask copilot-cli
+
+# Install script (macOS and Linux)
+curl -fsSL https://gh.io/copilot-install | bash
+```
+
+On Windows you can also use WinGet: `winget install GitHub.Copilot`.
+
+### OpenCode CLI
+
+OpenCode CLI needs an API key for the model provider you want to use; run
+`/connect` inside the TUI to configure one (this can be GitHub Copilot, as
+described above). Install it with one of the following, then run `opencode`.
+
+```bash
+# Install script (macOS and Linux)
+curl -fsSL https://opencode.ai/install | bash
+
+# npm (all platforms)
+npm install -g opencode-ai
+
+# Homebrew (macOS and Linux)
+brew install anomalyco/tap/opencode
+```
+
+## Creating a Personal Instructions File
+
+Personal instructions live outside the repository, in your home directory, and
+apply across all of your projects. GitHub Copilot reads them from
+`~/.copilot/copilot-instructions.md`. They are the place for preferences that
+are about *you*, not the project — so they are never committed and never shared
+with the team.
+
+Create the file and add a small amount of information about yourself. The
+example below matches the personal instructions used while building this
+repository:
+
+```markdown
+# Personal Information
+
+- My name is Steve Austin
+- My email address is steve.austin@bionic-man.com
+```
+
+You can add more over time — for example, a preferred tone for explanations or
+a default commit-message style — but keep it to genuine personal preferences.
+Anything that should apply to everyone on the team belongs in `AGENTS.md` or
+the `.github/instructions/` files instead.
+
+For OpenCode to read this file as well, grant it access to the `~/.copilot/`
+directory as shown in
+[Allowing OpenCode to read personal Copilot instructions](#allowing-opencode-to-read-personal-copilot-instructions).
+
+## Trying It Out: Questions Only the Context Can Answer
+
+Once the context files (`CONTEXT.md`, `ARCHITECTURE.md`, `DECISIONS.md`), the
+`.github/instructions/` files, and your personal instructions file are in
+place, both tools can answer questions that have no answer in the code alone.
+Run the same prompt in GitHub Copilot CLI and in OpenCode and you should get
+consistent answers, because both tools load the same shared context.
+
+To make each test a fair check of what the tools load from context — rather
+than something they remember from earlier in the conversation — start each one
+from a clean session:
+
+- **GitHub Copilot CLI**: run `/clear` to abandon the current session and start
+  fresh (or `/new` to start a new conversation).
+- **OpenCode**: run `/new` to clear the current session and start a new one.
+
+### Reading facts from the layered context
+
+- **"What is my email address (not read from Git)?"** — The answer comes from your
+  personal instructions file, not from your Git configuration. This shows the personal
+  layer is being applied.
+- **"What is the line length for Markdown files in this project?"** — Answered
+  from `.github/instructions/markdown.instructions.md`, which caps Markdown
+  lines at 400 characters (with a soft-wrap guideline around 80).
+- **"What formatter and line length apply to Python code, and why?"** —
+  Answered from the Python instructions and
+  [ADR 0004](docs/adrs/0004-use-ruff-for-linting-and-formatting.md): Ruff, with
+  a line length of 100.
+- **"How many active loans can a book have, and why?"** — Answered from the
+  `CRITICAL` constraint in `CONTEXT.md` and
+  [ADR 0009](docs/adrs/0009-loan-lifecycle-invariants.md): one, because the
+  library holds a single physical copy of every book.
+
+### Validating a change against the decisions
+
+The same context lets a tool check a proposed action against the project's
+rules, rather than just doing what it is asked:
+
+- **"I want to lend the same book to two people at once — is that allowed?"** —
+  It should flag this as contradicting a `CRITICAL` constraint (ADR 0009)
+  rather than implementing it.
+- **"Can I add `from __future__ import annotations` to `models.py`?"** — It
+  should say no: this is a `CRITICAL` rule because it breaks SQLModel
+  relationship resolution (ADR 0002).
+- **"Should I run `pip install` to add a dependency?"** — It should point you
+  to uv instead, per
+  [ADR 0003](docs/adrs/0003-use-uv-python-and-src-layout.md).
+
+If a tool cannot answer these, or gives a different answer from the other tool,
+that is a signal its context is not wired up correctly — for example a missing
+`AGENTS.md` hook or, for OpenCode, missing permission to read `~/.copilot/`.
+
+## Why This Matters for Quality with AI Tools
+
+An AI coding tool is only as consistent as the context it loads. Without shared
+instruction and context files, each tool — and each team member — works from
+whatever it can infer from the code in front of it, so the same request can
+produce different results depending on who ran it and with which tool. Over
+time that drift erodes coding standards and makes reviews harder.
+
+Putting the standards in files that every tool reads keeps behaviour consistent
+across a repository, a project, and a team:
+
+- **Shared conventions** in `AGENTS.md` and `.github/instructions/` mean every
+  tool formats, structures, and documents code the same way.
+- **Recorded decisions** in `DECISIONS.md` and the ADRs mean a tool can explain
+  *why* a rule exists and check a change against it, instead of silently
+  working around it.
+- **`CRITICAL` constraints** give the tool a hard stop: if a change would break
+  an irreversible or architectural rule, it flags the conflict rather than
+  producing plausible-looking code that violates it.
+- **Personal instructions** layer individual preferences on top without
+  polluting the shared, committed context.
+
+The result is that AI assistance raises code quality instead of undermining it:
+the tools accelerate work while staying inside the same guardrails a careful
+human reviewer would enforce.
+
