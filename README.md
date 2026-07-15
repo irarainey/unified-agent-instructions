@@ -228,11 +228,11 @@ same file OpenCode reads — it needs no Copilot-specific link file. Keeping the
 shared rules in `AGENTS.md` means Crush follows the same standards as GitHub
 Copilot, OpenCode, and Claude Code without any extra wiring.
 
-Connecting Copilot as Crush's model provider only changes which model answers
-your prompts; as with OpenCode, it does not make Crush read GitHub Copilot's
-own instruction files (`.github/copilot-instructions.md`,
-`.github/instructions/*.instructions.md`, or
-`~/.copilot/copilot-instructions.md`). `AGENTS.md` remains the link that keeps
+Connecting Copilot as Crush's model provider changes which model answers your
+prompts, but not which instruction files Crush reads — the same caveat as for
+OpenCode, described in
+[Using GitHub Copilot as an OpenCode provider](#using-github-copilot-as-an-opencode-provider).
+`AGENTS.md` remains the link that keeps
 its guidance consistent with the other tools.
 
 ## Claude Code
@@ -251,10 +251,10 @@ Copilot and OpenCode, keep the canonical rules in `AGENTS.md` and link
 - **Import**: Keep `CLAUDE.md` as a thin file that pulls in `AGENTS.md` using
   Claude Code's `@path` import syntax (e.g. `@AGENTS.md`).
 
-This repository ships a `CLAUDE.md` at its root that takes the thin-pointer
-approach: it notes that Claude Code does not support `AGENTS.md` and directs
-Claude Code to read and follow [AGENTS.md](AGENTS.md) in full, so the rules
-live in one place instead of being duplicated.
+This repository ships a `CLAUDE.md` at its root that takes a third, simpler
+approach: a short note explaining that Claude Code does not support
+`AGENTS.md`, directing it to read and follow [AGENTS.md](AGENTS.md) in full, so
+the rules live in one place instead of being duplicated.
 
 Either way, `AGENTS.md` stays the single source of truth, and GitHub Copilot,
 OpenCode, and Claude Code all end up following the same repository
@@ -266,9 +266,10 @@ A shared `AGENTS.md` (plus the linked `CLAUDE.md`) keeps *instructions*
 consistent across tools, but it only covers plain guidance. Several tools layer
 richer capabilities on top of their instruction files, and those extras are
 defined in tool-specific formats that the other tools neither read nor
-understand. Connecting GitHub Copilot to another tool as a *model provider*
-does not change this — it only changes which model answers prompts, not which
-features the harness supports.
+understand. As covered in
+[Using GitHub Copilot as an OpenCode provider](#using-github-copilot-as-an-opencode-provider),
+connecting GitHub Copilot to another tool as a *model provider* only changes
+which model answers prompts — it does not carry these extra features across.
 
 The clearest example is **GitHub Copilot's custom agents**, defined as Markdown
 files under `.github/agents/`. Each file describes a named, specialized agent —
@@ -301,8 +302,8 @@ because another tool is using Copilot as its provider.
 
 ## Installing the CLI Tools
 
-Both GitHub Copilot CLI and OpenCode CLI run in the terminal, so you can try
-this repository's shared instructions with either tool.
+GitHub Copilot CLI, OpenCode, Crush, and Claude Code all run in the terminal,
+so you can try this repository's shared instructions with any of them.
 
 ### GitHub Copilot CLI
 
@@ -340,6 +341,32 @@ npm install -g opencode-ai
 brew install anomalyco/tap/opencode
 ```
 
+### Crush
+
+Crush also needs a model provider configured (GitHub Copilot or otherwise)
+before its first run. Install it with one of the following, then run `crush`.
+
+```bash
+# npm (all platforms)
+npm install -g @charmland/crush
+
+# Homebrew (macOS and Linux)
+brew install charmbracelet/tap/crush
+```
+
+### Claude Code
+
+Claude Code requires a Claude subscription or API key. Install it with one of
+the following, then run `claude` and authenticate on first launch.
+
+```bash
+# npm (all platforms, requires Node.js 18 or later)
+npm install -g @anthropic-ai/claude-code
+
+# Install script (macOS, Linux, and WSL)
+curl -fsSL https://claude.ai/install.sh | bash
+```
+
 ## Creating a Personal Instructions File
 
 Personal instructions live outside the repository, in your home directory, and
@@ -372,9 +399,10 @@ directory as shown in
 
 Once the context files (`CONTEXT.md`, `ARCHITECTURE.md`, `DECISIONS.md`), the
 `.github/instructions/` files, and your personal instructions file are in
-place, both tools can answer questions that have no answer in the code alone.
-Run the same prompt in GitHub Copilot CLI and in OpenCode and you should get
-consistent answers, because both tools load the same shared context.
+place, every tool can answer questions that have no answer in the code alone.
+Run the same prompt in GitHub Copilot CLI, OpenCode, Crush, and Claude Code
+and you should get consistent answers, because each tool loads the same
+shared context.
 
 To make each test a fair check of what the tools load from context — rather
 than something they remember from earlier in the conversation — start each one
@@ -383,6 +411,10 @@ from a clean session:
 - **GitHub Copilot CLI**: run `/clear` to abandon the current session and start
   fresh (or `/new` to start a new conversation).
 - **OpenCode**: run `/new` to clear the current session and start a new one.
+- **Crush**: run `/new` (or start it with `crush -y` in a fresh terminal) to
+  start a new session.
+- **Claude Code**: run `/clear` to reset context while keeping the same
+  session, or exit and restart `claude` for a fully clean start.
 
 ### Reading facts from the layered context
 
@@ -416,9 +448,10 @@ rules, rather than just doing what it is asked:
   to uv instead, per
   [ADR 0003](docs/adrs/0003-use-uv-python-and-src-layout.md).
 
-If a tool cannot answer these, or gives a different answer from the other tool,
-that is a signal its context is not wired up correctly — for example a missing
-`AGENTS.md` hook or, for OpenCode, missing permission to read `~/.copilot/`.
+If a tool cannot answer these, or gives an answer that disagrees with the
+others, that is a signal its context is not wired up correctly — for example a
+missing `AGENTS.md` hook or, for OpenCode, missing permission to read
+`~/.copilot/`.
 
 ## Context Engineering and Human-First Engineering
 

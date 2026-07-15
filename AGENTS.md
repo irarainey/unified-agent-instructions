@@ -12,7 +12,7 @@
   contradict a `CRITICAL` constraint, stop and flag it rather than working
   around it.
 
-## Required: Instruction File Mapping
+## Required: Instructions File Mapping
 
 Before modifying or creating any file in this repository, you **must** check `.github/instructions/` for a matching instructions file and follow its rules.
 

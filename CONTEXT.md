@@ -6,9 +6,9 @@ the linked files only when the current task needs them.
 ## What this is
 
 A repository exploring how multiple AI coding tools (GitHub Copilot, OpenCode,
-Claude Code) can share consistent coding standards on one codebase. It ships a
-small example service — the **Bookshelf API** (FastAPI + SQLModel + SQLite) —
-for those instruction, agent, and context files to act on.
+Crush, Claude Code) can share consistent coding standards on one codebase. It
+ships a small example service — the **Bookshelf API** (FastAPI + SQLModel +
+SQLite) — for those instruction, agent, and context files to act on.
 
 ## Current state
 
@@ -21,7 +21,7 @@ for those instruction, agent, and context files to act on.
 ## Goals
 
 - Demonstrate one shared source of truth for coding standards across Copilot,
-  OpenCode, and Claude Code.
+  OpenCode, Crush, and Claude Code.
 - Keep a small, real example project for the instructions and agents to act on.
 
 ## Non-goals
