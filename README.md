@@ -4,7 +4,8 @@ This repo explores how a team can use different AI coding tools — GitHub
 Copilot, OpenCode, Claude Code, and others — on the same codebase while
 keeping coding standards consistent, documenting each tool's instruction
 conventions, the caveats that come with mixing them, and the approach used to
-bridge them together.
+bridge them together. It also includes a small example project — a Bookshelf
+API — for those instructions, agents, and context files to act on.
 
 ## Goal
 
@@ -18,6 +19,71 @@ This repo documents those differences and the caveats they introduce, and
 captures the approach we're using to bridge them — a shared `AGENTS.md` as
 the single source of truth, linked into each tool's own convention — so every
 engineer gets the same guidance no matter which tool sits in their harness.
+
+## Example Project: Bookshelf API
+
+To make these ideas concrete, the repository includes a small but real
+codebase for the instructions, agents, and context files to act on: a
+**Bookshelf API**, a REST service for managing library books, their authors,
+and loans.
+
+The API itself is deliberately unremarkable — the point is not the domain,
+but having a genuine project where you can watch different tools follow (or
+ignore) the shared conventions. It gives instruction files something to
+constrain, agents something to build against, and context files (such as the
+ADRs under `docs/adrs/`) somewhere real to draw project knowledge from.
+
+### What it does
+
+The service is built with **FastAPI** and persists data with **SQLModel** on
+top of SQLite. It exposes CRUD endpoints for three related entities:
+
+- **Authors** — create, list, fetch, update, and delete authors.
+- **Books** — the same operations, each book linked to an existing author,
+  with optional filtering by author.
+- **Loans** — borrow and return books, enforcing that a book can only be on
+  one active loan at a time.
+
+Interactive OpenAPI documentation is available at `/docs` once the app is
+running, and a `/health` endpoint provides a simple liveness check.
+
+### Project layout
+
+The code uses a `src/` layout so the package is imported exactly as it would
+be when installed, rather than relying on the repository root being on the
+path:
+
+```text
+src/bookshelf/
+  main.py            # FastAPI app factory and app instance
+  database.py        # SQLModel engine and session management
+  models.py          # Table models and request/response schemas
+  seed.py            # Seed script that creates and populates the database
+  routers/           # Route handlers for authors, books, and loans
+  data/              # JSON seed fixture
+docs/adrs/           # Architecture Decision Records
+```
+
+### Running it
+
+The project targets **Python 3.12** and manages its environment and
+dependencies with [uv](https://docs.astral.sh/uv/). From the repository root:
+
+```bash
+# Create the virtual environment and install dependencies
+uv sync --extra dev
+
+# Populate the database with sample data (6 authors, 15 books, 6 loans)
+uv run bookshelf-seed
+
+# Start the API with hot reload on http://127.0.0.1:8000
+uv run bookshelf
+```
+
+The seed script reads `src/bookshelf/data/seed_data.json`, so the sample data
+stays reviewable in diffs and the database file itself is never committed. A
+VS Code launch configuration ("FastAPI: Uvicorn") is included so the API can
+also be started and debugged with F5.
 
 ## Caveats and Challenges
 

@@ -1,0 +1,59 @@
+{
+  "authors": [
+    {
+      "id": 1,
+      "name": "Ursula K. Le Guin",
+      "biography": "American author best known for works of speculative fiction, including the Earthsea fantasy series and the Hainish Cycle."
+    },
+    {
+      "id": 2,
+      "name": "J.R.R. Tolkien",
+      "biography": "English writer and philologist, author of the high-fantasy works The Hobbit and The Lord of the Rings."
+    },
+    {
+      "id": 3,
+      "name": "Octavia E. Butler",
+      "biography": "American science fiction author, a multiple recipient of the Hugo and Nebula awards and a MacArthur Fellow."
+    },
+    {
+      "id": 4,
+      "name": "Terry Pratchett",
+      "biography": "English humorist and author of the Discworld series of comic fantasy novels."
+    },
+    {
+      "id": 5,
+      "name": "Isaac Asimov",
+      "biography": "American writer and professor of biochemistry, known for the Foundation and Robot series."
+    },
+    {
+      "id": 6,
+      "name": "N.K. Jemisin",
+      "biography": "American speculative fiction writer and the first author to win the Hugo Award for Best Novel three years in a row."
+    }
+  ],
+  "books": [
+    { "id": 1, "title": "A Wizard of Earthsea", "isbn": "9780553383041", "published_year": 1968, "author_id": 1 },
+    { "id": 2, "title": "The Left Hand of Darkness", "isbn": "9780441478125", "published_year": 1969, "author_id": 1 },
+    { "id": 3, "title": "The Dispossessed", "isbn": "9780061054884", "published_year": 1974, "author_id": 1 },
+    { "id": 4, "title": "The Hobbit", "isbn": "9780547928227", "published_year": 1937, "author_id": 2 },
+    { "id": 5, "title": "The Fellowship of the Ring", "isbn": "9780547928210", "published_year": 1954, "author_id": 2 },
+    { "id": 6, "title": "The Two Towers", "isbn": "9780547928203", "published_year": 1954, "author_id": 2 },
+    { "id": 7, "title": "Kindred", "isbn": "9780807083697", "published_year": 1979, "author_id": 3 },
+    { "id": 8, "title": "Parable of the Sower", "isbn": "9781538732182", "published_year": 1993, "author_id": 3 },
+    { "id": 9, "title": "The Colour of Magic", "isbn": "9780062225672", "published_year": 1983, "author_id": 4 },
+    { "id": 10, "title": "Mort", "isbn": "9780062225719", "published_year": 1987, "author_id": 4 },
+    { "id": 11, "title": "Guards! Guards!", "isbn": "9780062225758", "published_year": 1989, "author_id": 4 },
+    { "id": 12, "title": "Foundation", "isbn": "9780553293357", "published_year": 1951, "author_id": 5 },
+    { "id": 13, "title": "I, Robot", "isbn": "9780553294385", "published_year": 1950, "author_id": 5 },
+    { "id": 14, "title": "The Fifth Season", "isbn": "9780316229296", "published_year": 2015, "author_id": 6 },
+    { "id": 15, "title": "The Obelisk Gate", "isbn": "9780316229265", "published_year": 2016, "author_id": 6 }
+  ],
+  "loans": [
+    { "id": 1, "book_id": 2, "borrower": "Alice Chen", "loaned_on": "2026-06-01", "returned_on": "2026-06-20" },
+    { "id": 2, "book_id": 4, "borrower": "Ben Okafor", "loaned_on": "2026-06-15", "returned_on": null },
+    { "id": 3, "book_id": 7, "borrower": "Carla Diaz", "loaned_on": "2026-06-18", "returned_on": null },
+    { "id": 4, "book_id": 9, "borrower": "David Kim", "loaned_on": "2026-05-30", "returned_on": "2026-06-10" },
+    { "id": 5, "book_id": 12, "borrower": "Erzsebet Nagy", "loaned_on": "2026-07-01", "returned_on": null },
+    { "id": 6, "book_id": 14, "borrower": "Farah Haddad", "loaned_on": "2026-07-05", "returned_on": null }
+  ]
+}
