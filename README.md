@@ -113,8 +113,8 @@ This is about helping existing agents work better in your repository, not about
 creating or implementing agents themselves.
 
 One `AGENTS.md` can be shared across multiple tools (for example, GitHub
-Copilot and OpenCode), so you can keep one source of truth for agent guidance
-instead of duplicating tool-specific instruction files.
+Copilot, OpenCode, and Crush), so you can keep one source of truth for agent
+guidance instead of duplicating tool-specific instruction files.
 
 This helps define better coding standards across a repository by giving every
 AI tool the same rules to follow, regardless of which one a team member uses.
@@ -138,6 +138,10 @@ addition to support for `AGENTS.md`.
   user's own machine applies across all of that user's repositories,
   letting individuals layer personal preferences on top of shared,
   repository-level guidance.
+
+The same instructions files and options apply whether you use GitHub Copilot
+through the CLI or the Visual Studio Code chat extension — both discover and
+load the repository, personal, and `AGENTS.md` instructions in the same way.
 
 ## OpenCode
 
@@ -204,6 +208,26 @@ Configuring the permission in `opencode.json` makes the access persistent,
 so personal instructions are followed consistently without repeated
 prompts.
 
+## Crush
+
+Crush is [Charmbracelet's](https://github.com/charmbracelet/crush) open-source,
+terminal-first AI coding agent — a polished TUI written in Go. Like OpenCode, it
+is not tied to a single vendor and can be pointed at many model providers,
+including GitHub Copilot, so you can drive it with your existing Copilot
+subscription while it still reads its instructions from a plain `AGENTS.md`.
+
+Because Crush discovers repository conventions from `AGENTS.md` natively — the
+same file OpenCode reads — it needs no Copilot-specific link file. Keeping the
+shared rules in `AGENTS.md` means Crush follows the same standards as GitHub
+Copilot, OpenCode, and Claude Code without any extra wiring.
+
+Connecting Copilot as Crush's model provider only changes which model answers
+your prompts; as with OpenCode, it does not make Crush read GitHub Copilot's
+own instruction files (`.github/copilot-instructions.md`,
+`.github/instructions/*.instructions.md`, or
+`~/.copilot/copilot-instructions.md`). `AGENTS.md` remains the link that keeps
+its guidance consistent with the other tools.
+
 ## Claude Code
 
 Claude Code is Anthropic's terminal-based coding agent. Like GitHub Copilot,
@@ -219,6 +243,11 @@ Copilot and OpenCode, keep the canonical rules in `AGENTS.md` and link
   are always identical.
 - **Import**: Keep `CLAUDE.md` as a thin file that pulls in `AGENTS.md` using
   Claude Code's `@path` import syntax (e.g. `@AGENTS.md`).
+
+This repository ships a `CLAUDE.md` at its root that takes the thin-pointer
+approach: it notes that Claude Code does not support `AGENTS.md` and directs
+Claude Code to read and follow [AGENTS.md](AGENTS.md) in full, so the rules
+live in one place instead of being duplicated.
 
 Either way, `AGENTS.md` stays the single source of truth, and GitHub Copilot,
 OpenCode, and Claude Code all end up following the same repository
