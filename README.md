@@ -102,6 +102,13 @@ also be started and debugged with F5.
 - **No single native standard (yet)**: `AGENTS.md` is emerging as a common,
   open format, but not every tool reads it natively — some need a symlink or
   an import to pull it in, which has to be set up and maintained.
+- **Some features are tool-specific and do not port**: not everything has an
+  equivalent in every tool. A shared `AGENTS.md` keeps *instructions* aligned,
+  but capabilities layered on top of it — custom agents, prompt files, chat
+  modes, and similar — are usually defined in a tool's own proprietary format
+  and are simply invisible to the others. Using GitHub Copilot as a *provider*
+  for another tool does not carry these features across. See
+  [Tool-specific features that don't port](#tool-specific-features-that-dont-port).
 
 ## AGENTS.md
 
@@ -253,6 +260,45 @@ Either way, `AGENTS.md` stays the single source of truth, and GitHub Copilot,
 OpenCode, and Claude Code all end up following the same repository
 conventions.
 
+## Tool-specific features that don't port
+
+A shared `AGENTS.md` (plus the linked `CLAUDE.md`) keeps *instructions*
+consistent across tools, but it only covers plain guidance. Several tools layer
+richer capabilities on top of their instruction files, and those extras are
+defined in tool-specific formats that the other tools neither read nor
+understand. Connecting GitHub Copilot to another tool as a *model provider*
+does not change this — it only changes which model answers prompts, not which
+features the harness supports.
+
+The clearest example is **GitHub Copilot's custom agents**, defined as Markdown
+files under `.github/agents/`. Each file describes a named, specialized agent —
+its purpose, the tools it may use, and the model it runs on — that Copilot can
+delegate work to. This is a Copilot convention:
+
+- **OpenCode** and **Crush** read `AGENTS.md`, but they do not read
+  `.github/agents/`. They have their own, differently shaped mechanisms for
+  subagents, so a Copilot custom agent is invisible to them even when they are
+  driven by Copilot as a provider.
+- **Claude Code** has its own subagents (under `.claude/agents/`) with a
+  different schema, so Copilot's definitions do not transfer either.
+
+The same portability gap applies to other Copilot-specific assets that live
+outside `AGENTS.md`, such as:
+
+- **Prompt files** (`.github/prompts/*.prompt.md`) — reusable, parameterized
+  prompts.
+- **Chat modes** (`*.chatmode.md`) — curated tool-and-instruction bundles for a
+  session.
+- **`applyTo`-scoped instructions** (`.github/instructions/*.instructions.md`) —
+  only GitHub Copilot honors the `applyTo` glob scoping; other tools ignore
+  these files entirely unless their rules are also present in `AGENTS.md`.
+
+The practical takeaway: put anything that must apply everywhere into
+`AGENTS.md` (and link it into each tool). Treat custom agents, prompt files,
+chat modes, and other proprietary extras as **tool-specific enhancements** that
+only work in the tool that defines them — do not assume they carry over just
+because another tool is using Copilot as its provider.
+
 ## Installing the CLI Tools
 
 Both GitHub Copilot CLI and OpenCode CLI run in the terminal, so you can try
@@ -373,6 +419,41 @@ rules, rather than just doing what it is asked:
 If a tool cannot answer these, or gives a different answer from the other tool,
 that is a signal its context is not wired up correctly — for example a missing
 `AGENTS.md` hook or, for OpenCode, missing permission to read `~/.copilot/`.
+
+## Context Engineering and Human-First Engineering
+
+The context files this repository leans on — `CONTEXT.md`, `ARCHITECTURE.md`,
+`DECISIONS.md`, and the ADRs under `docs/adrs/` — are a deliberate example of
+**context engineering**, a practice described in the
+[Human-First Engineering](https://humanfirstengineering.dev/) toolkit.
+
+Context engineering is the deliberate practice of capturing, curating, and
+preserving the engineering knowledge that humans *and* AI need to reason
+correctly about a system over time. It is distinct from prompt engineering:
+prompt engineering optimises a single request, while context engineering builds
+durable knowledge that is reused across sessions, tools, and people. A model's
+context window is finite, and long-running, multi-tool, multi-agent work
+quietly compacts it — the first thing lost is usually the expensive part: *why*
+a decision was made, what was rejected, and the constraints the code does not
+show.
+
+This repository preserves exactly that knowledge instead of letting it scroll
+away in a chat history:
+
+- **`CONTEXT.md`** — the always-on core context, including the `CRITICAL`
+  constraints that must never be worked around.
+- **`ARCHITECTURE.md`** — the shape, boundaries, and component map, loaded on
+  demand.
+- **`DECISIONS.md`** and **`docs/adrs/`** — the recorded rationale behind each
+  decision, so any human or agent can see not just *what* the rules are but
+  *why* they exist.
+
+Because that reasoning lives in files every tool can load, GitHub Copilot,
+OpenCode, Crush, and Claude Code all reason from the same durable context — and
+so does the next engineer who joins. For the full practice, templates, and
+guidance, see
+[Context Engineering](https://humanfirstengineering.dev/toolkit/context-engineering)
+in the Human-First Engineering toolkit.
 
 ## Why This Matters for Quality with AI Tools
 
