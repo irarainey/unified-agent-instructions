@@ -107,6 +107,37 @@ regardless of which provider it's using. It only ever loads instructions from
 is why `AGENTS.md` remains the required link for keeping instructions
 consistent between the two tools.
 
+### Allowing OpenCode to read personal Copilot instructions
+
+Some Copilot setups reference a personal instructions file at
+`~/.copilot/copilot-instructions.md`, outside of the repository, for a
+user's own preferences layered on top of shared guidance. By default,
+OpenCode restricts file access to the current project directory and will
+not read files outside of it, even when a linked-in file such as
+`AGENTS.md` points to that location.
+
+To allow OpenCode to read this file, grant it permission to access the
+directory by adding an `external_directory` permission entry to
+`opencode.json`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "external_directory": {
+      "~/.copilot/**": "allow"
+    }
+  }
+}
+```
+
+Without this permission, OpenCode prompts the user to approve access to
+`~/.copilot/` every time it needs to read from it, and that approval only
+lasts for the current run — it resets the next time OpenCode starts.
+Configuring the permission in `opencode.json` makes the access persistent,
+so personal instructions are followed consistently without repeated
+prompts.
+
 ## Claude Code
 
 Claude Code is Anthropic's terminal-based coding agent. Like GitHub Copilot,
