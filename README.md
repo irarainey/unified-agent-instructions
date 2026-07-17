@@ -260,6 +260,33 @@ Either way, `AGENTS.md` stays the single source of truth, and GitHub Copilot,
 OpenCode, and Claude Code all end up following the same repository
 conventions.
 
+### Allowing Claude Code to read personal Copilot instructions
+
+Like OpenCode, Claude Code restricts file access to the current project
+directory by default and will not read files outside of it, even when a
+linked-in file such as `AGENTS.md` points to a personal instructions file at
+`~/.copilot/copilot-instructions.md`.
+
+To allow Claude Code to read this file, grant it permission to access the
+directory by adding a `Read` allow rule to `.claude/settings.json`:
+
+```json
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Read(~/.copilot/**)"
+    ]
+  }
+}
+```
+
+Without this permission, Claude Code prompts the user to approve access to
+`~/.copilot/` the first time it needs to read from it. Configuring the
+permission in `.claude/settings.json` makes the access persistent and, since
+this file is checked into source control, shares it with every collaborator
+on the repository — the same effect that `opencode.json` has for OpenCode.
+
 ## Tool-specific features that don't port
 
 A shared `AGENTS.md` (plus the linked `CLAUDE.md`) keeps *instructions*
@@ -394,6 +421,9 @@ the `.github/instructions/` files instead.
 For OpenCode to read this file as well, grant it access to the `~/.copilot/`
 directory as shown in
 [Allowing OpenCode to read personal Copilot instructions](#allowing-opencode-to-read-personal-copilot-instructions).
+For Claude Code to read this file as well, grant it access to the
+`~/.copilot/` directory as shown in
+[Allowing Claude Code to read personal Copilot instructions](#allowing-claude-code-to-read-personal-copilot-instructions).
 
 ## Trying It Out: Questions Only the Context Can Answer
 
@@ -450,8 +480,8 @@ rules, rather than just doing what it is asked:
 
 If a tool cannot answer these, or gives an answer that disagrees with the
 others, that is a signal its context is not wired up correctly — for example a
-missing `AGENTS.md` hook or, for OpenCode, missing permission to read
-`~/.copilot/`.
+missing `AGENTS.md` hook, or, for OpenCode or Claude Code, missing permission
+to read `~/.copilot/`.
 
 ## Context Engineering and Human-First Engineering
 
